@@ -64,9 +64,23 @@ public class NettyClient implements DisposableBean{
                     ch.pipeline().addLast(new IntellifTransactionHandler());
                 }
             });
+
+            ChannelFuture future = b.connect(host, port);
             logger.info(">>>>>>>>>>>>>>>>>>>>>>>客户端已经启动 host:" + host + ",port:" + port);
-            ChannelFuture future = b.connect(host, port).sync();
-            future.channel().closeFuture().sync();
+            future.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if (!channelFuture.isSuccess()) {
+                        channelFuture.channel().eventLoop().schedule(new Runnable() {
+                            @Override
+                            public void run() {
+                                isStarting = false;
+                                start();
+                            }
+                        }, 5, TimeUnit.SECONDS);
+                    }
+                }
+            });
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage());
             isStarting =false;

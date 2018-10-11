@@ -21,7 +21,7 @@ public class DataSourceAspect {
         /**
          * 需要开启分布式事务
          */
-        if(TransactionConnUtils.getKey()!=null) {
+        if(TransactionConnUtils.getKey()!=null&&!TransactionConnUtils.getKey().equals("")) {
             Connection connection = (Connection) point.proceed();
             connection.setAutoCommit(false);
             IntellifConnetion intellifConnetion = new IntellifConnetion(connection);

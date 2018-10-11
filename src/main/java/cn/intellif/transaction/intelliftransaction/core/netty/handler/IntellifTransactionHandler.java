@@ -1,6 +1,6 @@
 package cn.intellif.transaction.intelliftransaction.core.netty.handler;
 
-import cn.intellif.transaction.intelliftransaction.aware.ApplicationContextUtils;
+import cn.intellif.transaction.intelliftransaction.aware.ApplicationContextAwareUtils;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.NettyClient;
 import cn.intellif.transaction.intelliftransaction.core.netty.entity.NettyEntity;
@@ -25,7 +25,6 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
 
     private Executor threadPool = Executors.newFixedThreadPool(30);
 
-    private NettyClient nettyClient = ApplicationContextUtils.getBean(NettyClient.class);
 
 
     public IntellifTransactionHandler() {
@@ -77,7 +76,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
         logger.info(">>>>>>>>>>>>>>和客户端连接已经断开  -->" + ctx);
         SocketManager.getInstance().setNetState(false);
         //链接断开,重新连接
-        nettyClient.restart();
+        ApplicationContextAwareUtils.getBean(NettyClient.class).restart();
     }
 
 
