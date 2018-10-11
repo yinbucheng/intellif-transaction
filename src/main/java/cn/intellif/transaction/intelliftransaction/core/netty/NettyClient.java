@@ -11,13 +11,14 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class NettyClient {
+public class NettyClient implements DisposableBean{
 
     private static Logger logger = LoggerFactory.getLogger(NettyClient.class);
     private EventLoopGroup workerGroup;
@@ -86,6 +87,17 @@ public class NettyClient {
 
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage());
+            isStarting =false;
+            if(workerGroup!=null){
+                workerGroup.shutdownGracefully();
+            }
+        }
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if(workerGroup!=null){
+            workerGroup.shutdownGracefully();
         }
     }
 }
