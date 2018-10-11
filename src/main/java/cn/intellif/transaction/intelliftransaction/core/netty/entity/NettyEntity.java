@@ -41,7 +41,11 @@ public class NettyEntity implements Serializable{
     }
 
     public static NettyEntity getPing(){
-        return new NettyEntity(TransactionConnUtils.getKey(),PING);
+        String key  =TransactionConnUtils.getKey();
+        if(key==null){
+            key = "";
+        }
+        return new NettyEntity(key,PING);
     }
 
     public static NettyEntity getPong(){

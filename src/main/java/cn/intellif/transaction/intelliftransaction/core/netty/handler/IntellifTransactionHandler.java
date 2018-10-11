@@ -7,6 +7,7 @@ import cn.intellif.transaction.intelliftransaction.core.netty.entity.NettyEntity
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import com.alibaba.fastjson.JSON;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+@ChannelHandler.Sharable
 public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
 
     private Logger logger = LoggerFactory.getLogger(IntellifTransactionHandler.class);
@@ -32,7 +34,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
 
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-        logger.debug("TxManager-response->" + msg);
+        logger.info("获取掉服务器返回的信息:" + msg);
         final NettyEntity entity = JSON.parseObject((String)msg,NettyEntity.class);
         threadPool.execute(new Runnable() {
             @Override
@@ -48,30 +50,31 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
      */
     private void handleMsg(final  NettyEntity nettyEntity){
         String key = nettyEntity.getKey();
-        Integer state = nettyEntity.getStatus();
-        if(state==NettyEntity.PONG){
-            SocketManager.getInstance().setNetState(true);
-        }
-        if(state==NettyEntity.COMMIT){
-            TransactionConnUtils.commit();
-        }
-        if(state==NettyEntity.ROLLBACK){
-            TransactionConnUtils.rollback();
-        }
-        if(state==NettyEntity.CLOSE){
-            TransactionConnUtils.release();
+        if(!key.equals("")) {
+            Integer state = nettyEntity.getStatus();
+            if (state == NettyEntity.COMMIT) {
+                TransactionConnUtils.commit();
+            }
+            if (state == NettyEntity.ROLLBACK) {
+                TransactionConnUtils.rollback();
+            }
+            if (state == NettyEntity.CLOSE) {
+                TransactionConnUtils.release();
+            }
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>客户端出现问题:"+ctx);
         cause.printStackTrace();
+        ctx.close();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        logger.info("disconnection  -->" + ctx);
+        logger.info(">>>>>>>>>>>>>>和客户端连接已经断开  -->" + ctx);
         SocketManager.getInstance().setNetState(false);
         //链接断开,重新连接
         nettyClient.restart();
@@ -82,7 +85,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         SocketManager.getInstance().setContext(ctx);
-        logger.info("connection -->" + ctx);
+        SocketManager.getInstance().setNetState(true);
         //通道激活后进行心跳检查
         SocketManager.getInstance().sendMsg(ProtocolUtils.ping());
     }
@@ -102,7 +105,6 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
             IdleStateEvent event = (IdleStateEvent) evt;
             if (event.state() == IdleState.READER_IDLE) {
                 //表示已经多久没有收到数据了
-                //ctx.close();
             } else if (event.state() == IdleState.WRITER_IDLE) {
                 //表示已经多久没有发送数据了
                 SocketManager.getInstance().sendMsg(ProtocolUtils.ping());

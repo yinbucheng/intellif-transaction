@@ -8,6 +8,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,6 @@ public class NettyClient implements DisposableBean{
 
         workerGroup = new NioEventLoopGroup();
         try {
-            IntellifTransactionHandler transactionHandler = new IntellifTransactionHandler();
             Bootstrap b = new Bootstrap();
             b.group(workerGroup);
             b.channel(NioSocketChannel.class);
@@ -57,34 +58,15 @@ public class NettyClient implements DisposableBean{
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-
-                    ch.pipeline().addLast("timeout", new IdleStateHandler(heart, heart, heart, TimeUnit.SECONDS));
-
-                    ch.pipeline().addLast(new LengthFieldPrepender(4, false));
-                    ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-
-                    ch.pipeline().addLast(transactionHandler);
+                    ch.pipeline().addLast("timeout", new IdleStateHandler(10, 5, 20, TimeUnit.SECONDS));
+                    ch.pipeline().addLast(new StringEncoder());
+                    ch.pipeline().addLast(new StringDecoder());
+                    ch.pipeline().addLast(new IntellifTransactionHandler());
                 }
             });
-            // Start the client.
-            logger.info("connection txManager-socket-> host:" + host + ",port:" + port);
-            ChannelFuture future = b.connect(host, port); // (5)
-
-            future.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                    if (!channelFuture.isSuccess()) {
-                        channelFuture.channel().eventLoop().schedule(new Runnable() {
-                            @Override
-                            public void run() {
-                                isStarting = false;
-                                start();
-                            }
-                        }, 5, TimeUnit.SECONDS);
-                    }
-                }
-            });
-
+            logger.info(">>>>>>>>>>>>>>>>>>>>>>>客户端已经启动 host:" + host + ",port:" + port);
+            ChannelFuture future = b.connect(host, port).sync();
+            future.channel().closeFuture().sync();
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage());
             isStarting =false;
