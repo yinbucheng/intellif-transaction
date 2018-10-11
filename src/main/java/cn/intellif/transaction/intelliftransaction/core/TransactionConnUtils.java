@@ -10,6 +10,11 @@ public class TransactionConnUtils {
 
     private static ThreadLocal<String> keys = new ThreadLocal<>();
 
+
+    public static synchronized void remveConnection(String key){
+        cache.remove(key);
+    }
+
     /**
      * 初始化唯一表示
      */

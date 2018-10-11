@@ -1,6 +1,7 @@
 package cn.intellif.transaction.intelliftransaction.utils;
 
 import cn.intellif.transaction.intelliftransaction.core.IntellifConnetion;
+import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -12,7 +13,7 @@ public class ConnectionTimeOutUtils {
 
     private static Executor executor = Executors.newCachedThreadPool();
 
-    public static void timeOut(IntellifConnetion connetion,int timeout){
+    public static void timeOut(IntellifConnetion connetion,int timeout,String key){
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -22,6 +23,7 @@ public class ConnectionTimeOutUtils {
                         connetion.realRollback();
                         connetion.realClose();
                     }
+                    TransactionConnUtils.remveConnection(key);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
