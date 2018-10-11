@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxTransactionAspect {
 
-    @Value("intellif.transacton.timeout")
+    @Value("${intellif.transacton.timeout}")
     private Integer timeout;
 
     @Around("@annotation(cn.intellif.transaction.intelliftransaction.anotation.TxTransaction)")
