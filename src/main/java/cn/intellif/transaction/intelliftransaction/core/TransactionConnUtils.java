@@ -39,7 +39,11 @@ public class TransactionConnUtils {
     }
 
     public static String getKey(){
-        return keys.get();
+        String key =  keys.get();
+        if(key==null){
+            key ="";
+        }
+        return key;
     }
 
     /**

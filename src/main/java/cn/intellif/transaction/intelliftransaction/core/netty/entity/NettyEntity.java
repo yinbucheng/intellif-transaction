@@ -15,6 +15,7 @@ public class NettyEntity implements Serializable{
     public static int COMMIT =2;
     public static int ROLLBACK =3;
     public static int CLOSE =4;
+    public static int REGISTER =5;
 
     public NettyEntity() {
     }
@@ -62,5 +63,9 @@ public class NettyEntity implements Serializable{
 
     public static NettyEntity getClose(){
         return new NettyEntity(TransactionConnUtils.getKey(),CLOSE);
+    }
+
+    public static NettyEntity getRegister(){
+        return new NettyEntity(TransactionConnUtils.getKey(),REGISTER);
     }
 }

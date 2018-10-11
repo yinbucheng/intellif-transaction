@@ -39,7 +39,7 @@ public class TxTransactionAspect  implements Ordered {
         TransactionConnUtils.intKey();
         try{
             //将唯一表示告诉txmanger并开启超时机制
-            SocketManager.getInstance().sendMsg(ProtocolUtils.ping());
+            SocketManager.getInstance().sendMsg(ProtocolUtils.register());
             ConnectionTimeOutUtils.timeOut(TransactionConnUtils.getConnection(),timeout,TransactionConnUtils.getKey());
             Object result =   joinPoint.proceed();
            //发送成功信息告诉txmanager
@@ -78,7 +78,7 @@ public class TxTransactionAspect  implements Ordered {
         TransactionConnUtils.initKey(token);
         try{
             //将唯一标示告诉txManager
-            SocketManager.getInstance().sendMsg(ProtocolUtils.ping());
+            SocketManager.getInstance().sendMsg(ProtocolUtils.register());
             ConnectionTimeOutUtils.timeOut(TransactionConnUtils.getConnection(),timeout,TransactionConnUtils.getKey());
             return joinPoint.proceed();
         }catch (Exception e){

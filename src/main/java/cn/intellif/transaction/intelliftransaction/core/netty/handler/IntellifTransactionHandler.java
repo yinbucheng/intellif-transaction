@@ -86,7 +86,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
         super.channelActive(ctx);
         SocketManager.getInstance().setContext(ctx);
         SocketManager.getInstance().setNetState(true);
-        //通道激活后进行心跳检查
+        //告诉服务端
         SocketManager.getInstance().sendMsg(ProtocolUtils.ping());
     }
 
