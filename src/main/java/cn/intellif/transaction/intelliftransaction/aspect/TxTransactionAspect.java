@@ -4,7 +4,6 @@ import cn.intellif.transaction.intelliftransaction.anotation.TxTransaction;
 import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
-import cn.intellif.transaction.intelliftransaction.utils.LockUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import cn.intellif.transaction.intelliftransaction.utils.WebUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
