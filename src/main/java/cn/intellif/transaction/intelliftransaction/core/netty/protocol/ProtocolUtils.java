@@ -10,7 +10,7 @@ public class ProtocolUtils {
 
     private static String getContent(NettyEntity entity){
         String content =  JSON.toJSONString(entity);
-        content+="/n";
+        content+=System.getProperty("line.separator");
         return content;
     }
 

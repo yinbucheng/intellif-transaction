@@ -8,6 +8,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -60,6 +61,7 @@ public class NettyClient implements DisposableBean{
                 public void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline().addLast("timeout", new IdleStateHandler(10, 5, 20, TimeUnit.SECONDS));
                     ch.pipeline().addLast(new StringEncoder());
+                    ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
                     ch.pipeline().addLast(new StringDecoder());
                     ch.pipeline().addLast(new IntellifTransactionHandler());
                 }

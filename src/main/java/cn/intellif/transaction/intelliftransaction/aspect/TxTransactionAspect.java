@@ -4,12 +4,13 @@ import cn.intellif.transaction.intelliftransaction.anotation.TxTransaction;
 import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
-import cn.intellif.transaction.intelliftransaction.utils.ConnectionTimeOutUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import cn.intellif.transaction.intelliftransaction.utils.WebUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
@@ -22,6 +23,8 @@ public class TxTransactionAspect  implements Ordered {
     @Value("${intellif.transacton.timeout}")
     private Integer timeout;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Around("@annotation(cn.intellif.transaction.intelliftransaction.anotation.TxTransaction)")
     public Object aroundWithTx(ProceedingJoinPoint joinPoint) throws Throwable {
         return runTxTransaction(joinPoint);
@@ -33,6 +36,11 @@ public class TxTransactionAspect  implements Ordered {
     }
 
     private Object runTxTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+        //判断其是否为上一个调用链过来的如果是直接放行
+        String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
+        if(token!=null){
+            return joinPoint.proceed();
+        }
         /**
          * 创建唯一标示
          */
@@ -40,7 +48,6 @@ public class TxTransactionAspect  implements Ordered {
         try{
             //将唯一表示告诉txmanger并开启超时机制
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
-//            ConnectionTimeOutUtils.timeOut(TransactionConnUtils.getConnection(),timeout,TransactionConnUtils.getKey());
             Object result =   joinPoint.proceed();
            //发送成功信息告诉txmanager
             SocketManager.getInstance().sendMsg(ProtocolUtils.commit());
@@ -51,6 +58,7 @@ public class TxTransactionAspect  implements Ordered {
             throw new RuntimeException(e);
         }finally {
             //发送关闭信息给txmanager
+            logger.info(">>>>>>>>>>>>>>>>>发送关闭命令 key为:"+TransactionConnUtils.getKey());
             SocketManager.getInstance().sendMsg(ProtocolUtils.clear());
         }
     }
@@ -72,14 +80,13 @@ public class TxTransactionAspect  implements Ordered {
             return joinPoint.proceed();
         }
         String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
-        if(token==null){
+        if(token==null||TransactionConnUtils.keyIsNotEmpty()){
             return joinPoint.proceed();
         }
         TransactionConnUtils.initKey(token);
         try{
             //将唯一标示告诉txManager
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
-//            ConnectionTimeOutUtils.timeOut(TransactionConnUtils.getConnection(),timeout,TransactionConnUtils.getKey());
             return joinPoint.proceed();
         }catch (Exception e){
             //发送异常信息告诉txManager

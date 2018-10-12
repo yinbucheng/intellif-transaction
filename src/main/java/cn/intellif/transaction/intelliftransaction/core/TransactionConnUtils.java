@@ -10,6 +10,20 @@ public class TransactionConnUtils {
 
     private static ThreadLocal<String> keys = new ThreadLocal<>();
 
+    private static ThreadLocal<Boolean> use = new ThreadLocal<Boolean>(){
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
+
+    public static boolean keyIsNotEmpty(){
+         String key = keys.get();
+         if(key==null||key.equals(""))
+             return false;
+         return true;
+    }
+
 
     public static synchronized void remveConnection(String key){
         cache.remove(key);
@@ -60,8 +74,9 @@ public class TransactionConnUtils {
     public  static void commit(){
       IntellifConnetion intellifConnetion =   cache.get(getKey());
       try {
-        if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
+        if(intellifConnetion!=null&&!intellifConnetion.isClosed()&&!use.get()) {
               intellifConnetion.realCommit();
+              use.set(true);
          }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -74,8 +89,9 @@ public class TransactionConnUtils {
     public static void rollback(){
         IntellifConnetion intellifConnetion = cache.get(getKey());
         try {
-            if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
+            if(intellifConnetion!=null&&!intellifConnetion.isClosed()&&!use.get()) {
                 intellifConnetion.realRollback();
+                use.set(true);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -86,7 +102,7 @@ public class TransactionConnUtils {
      * 释放资源
      */
     public static void release(){
-      String key =   keys.get();
+      String key =  keys.get();
       keys.remove();
       synchronized (TransactionConnUtils.class){
          IntellifConnetion connetion =  cache.get(key);
@@ -98,6 +114,7 @@ public class TransactionConnUtils {
               e.printStackTrace();
           }
           cache.remove(key);
+          use.remove();
       }
     }
 
