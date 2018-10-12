@@ -48,17 +48,16 @@ public class TxTransactionAspect  implements Ordered {
         try{
             //将唯一表示告诉txmanger并开启超时机制
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
-            Object result =   joinPoint.proceed();
-           //发送成功信息告诉txmanager
+            Object result =  joinPoint.proceed();
+           //发送提交命令 及关闭命令
             SocketManager.getInstance().sendMsg(ProtocolUtils.commit());
             return result;
         }catch (Exception e){
-            //发送异常信息告诉txmanager
+            //发送回滚及 关闭命令
             SocketManager.getInstance().sendMsg(ProtocolUtils.rollback());
             throw new RuntimeException(e);
         }finally {
-            //发送关闭信息给txmanager
-            logger.info(">>>>>>>>>>>>>>>>>发送关闭命令 key为:"+TransactionConnUtils.getKey());
+            //释放资源
             SocketManager.getInstance().sendMsg(ProtocolUtils.clear());
         }
     }

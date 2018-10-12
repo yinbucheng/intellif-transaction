@@ -28,7 +28,7 @@ public class IntellifConnetion implements Connection {
      * @throws SQLException
      */
     public void realRollback() throws SQLException {
-        connection.rollback();;
+        connection.rollback();
     }
 
     /**

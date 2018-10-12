@@ -55,13 +55,12 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
         if(!key.equals("")) {
             Integer state = nettyEntity.getStatus();
             if (state == NettyEntity.COMMIT) {
-                TransactionConnUtils.commit();
+                TransactionConnUtils.commit(key);
+                TransactionConnUtils.release(key);
             }
             if (state == NettyEntity.ROLLBACK) {
-                TransactionConnUtils.rollback();
-            }
-            if (state == NettyEntity.CLOSE) {
-                TransactionConnUtils.release();
+                TransactionConnUtils.rollback(key);
+                TransactionConnUtils.release(key);
             }
         }
     }

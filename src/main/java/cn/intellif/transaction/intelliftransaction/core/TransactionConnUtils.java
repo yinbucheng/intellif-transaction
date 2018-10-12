@@ -10,12 +10,6 @@ public class TransactionConnUtils {
 
     private static ThreadLocal<String> keys = new ThreadLocal<>();
 
-    private static ThreadLocal<Boolean> use = new ThreadLocal<Boolean>(){
-        @Override
-        protected Boolean initialValue() {
-            return false;
-        }
-    };
 
     public static boolean keyIsNotEmpty(){
          String key = keys.get();
@@ -74,10 +68,23 @@ public class TransactionConnUtils {
     public  static void commit(){
       IntellifConnetion intellifConnetion =   cache.get(getKey());
       try {
-        if(intellifConnetion!=null&&!intellifConnetion.isClosed()&&!use.get()) {
+        if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
               intellifConnetion.realCommit();
-              use.set(true);
          }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 提交
+     */
+    public  static void commit(String key){
+        IntellifConnetion intellifConnetion =   cache.get(key);
+        try {
+            if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
+                intellifConnetion.realCommit();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -89,9 +96,22 @@ public class TransactionConnUtils {
     public static void rollback(){
         IntellifConnetion intellifConnetion = cache.get(getKey());
         try {
-            if(intellifConnetion!=null&&!intellifConnetion.isClosed()&&!use.get()) {
+            if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
                 intellifConnetion.realRollback();
-                use.set(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 回滚
+     */
+    public static void rollback(String key){
+        IntellifConnetion intellifConnetion = cache.get(key);
+        try {
+            if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
+                intellifConnetion.realRollback();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -104,18 +124,27 @@ public class TransactionConnUtils {
     public static void release(){
       String key =  keys.get();
       keys.remove();
-      synchronized (TransactionConnUtils.class){
-         IntellifConnetion connetion =  cache.get(key);
-          try {
-              if(connetion!=null&&!connetion.isClosed()) {
-                  connetion.realClose();
-              }
-          } catch (SQLException e) {
-              e.printStackTrace();
-          }
-          cache.remove(key);
-          use.remove();
-      }
+        removeCache(key);
     }
 
+    private static void removeCache(String key) {
+        synchronized (TransactionConnUtils.class){
+           IntellifConnetion connetion =  cache.get(key);
+            try {
+                if(connetion!=null&&!connetion.isClosed()) {
+                    connetion.realClose();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            cache.remove(key);
+        }
+    }
+
+    /**
+     * 释放资源
+     */
+    public static void release(String key){
+        removeCache(key);
+    }
 }
