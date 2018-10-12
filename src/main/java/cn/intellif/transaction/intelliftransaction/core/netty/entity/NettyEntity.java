@@ -68,4 +68,12 @@ public class NettyEntity implements Serializable{
     public static NettyEntity getRegister(){
         return new NettyEntity(TransactionConnUtils.getKey(),REGISTER);
     }
+
+    @Override
+    public String toString() {
+        return "NettyEntity{" +
+                "key='" + key + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

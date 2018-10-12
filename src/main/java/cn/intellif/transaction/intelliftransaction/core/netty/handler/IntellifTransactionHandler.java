@@ -52,8 +52,11 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
      */
     private void handleMsg(final  NettyEntity nettyEntity){
         String key = nettyEntity.getKey();
+        int state = nettyEntity.getStatus();
+        if(state!=NettyEntity.PONG){
+            logger.info(">>>>>>>>>>>>>>>>>>>>>>接收服务端数据:"+nettyEntity.toString());
+        }
         if(!key.equals("")) {
-            Integer state = nettyEntity.getStatus();
             if (state == NettyEntity.COMMIT) {
                 TransactionConnUtils.commit(key);
                 TransactionConnUtils.release(key);

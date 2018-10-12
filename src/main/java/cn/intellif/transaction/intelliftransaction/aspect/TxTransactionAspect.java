@@ -4,6 +4,7 @@ import cn.intellif.transaction.intelliftransaction.anotation.TxTransaction;
 import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
+import cn.intellif.transaction.intelliftransaction.utils.LockUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import cn.intellif.transaction.intelliftransaction.utils.WebUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -38,7 +39,7 @@ public class TxTransactionAspect  implements Ordered {
     private Object runTxTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
         //判断其是否为上一个调用链过来的如果是直接放行
         String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
-        if(token!=null){
+        if(token!=null&&!token.equals("")){
             return joinPoint.proceed();
         }
         /**
@@ -58,7 +59,9 @@ public class TxTransactionAspect  implements Ordered {
             throw new RuntimeException(e);
         }finally {
             //释放资源
+            Thread.sleep(100);
             SocketManager.getInstance().sendMsg(ProtocolUtils.clear());
+            TransactionConnUtils.release();
         }
     }
 
@@ -75,15 +78,17 @@ public class TxTransactionAspect  implements Ordered {
 
     private Object runTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
         Class clazz =  AopUtils.getTargetClass(joinPoint.getTarget());
-        if(clazz.getAnnotation(TxTransaction.class)!=null){
+        if(clazz.getAnnotation(TxTransaction.class)!=null&&TransactionConnUtils.keyIsNotEmpty()){
             return joinPoint.proceed();
         }
         String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
-        if(token==null||TransactionConnUtils.keyIsNotEmpty()){
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>当前服务获取token:"+token);
+        if(token==null){
             return joinPoint.proceed();
         }
         TransactionConnUtils.initKey(token);
         try{
+            logger.info(">>>>>>>>>>>>>>>>>>>>>>进入代理方法中");
             //将唯一标示告诉txManager
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
             return joinPoint.proceed();
@@ -91,7 +96,10 @@ public class TxTransactionAspect  implements Ordered {
             //发送异常信息告诉txManager
             SocketManager.getInstance().sendMsg(ProtocolUtils.rollback());
             throw new RuntimeException(e);
+        }finally {
+            TransactionConnUtils.release();
         }
+
     }
 
     @Override

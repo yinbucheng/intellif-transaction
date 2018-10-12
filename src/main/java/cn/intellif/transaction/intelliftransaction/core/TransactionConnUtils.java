@@ -1,5 +1,9 @@
 package cn.intellif.transaction.intelliftransaction.core;
 
+import cn.intellif.transaction.intelliftransaction.utils.LockUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,8 +11,35 @@ import java.util.UUID;
 
 public class TransactionConnUtils {
     private static Map<String,IntellifConnetion> cache = new HashMap<>();
+    private static Logger logger = LoggerFactory.getLogger(TransactionConnUtils.class);
 
     private static ThreadLocal<String> keys = new ThreadLocal<>();
+
+    private static volatile  int currentThread = 0;
+
+    private static volatile int maxThread = 30;
+
+
+    private static final String LOCK ="CURRENT_THREAD";
+
+    public static boolean canAcessConn(){
+        return currentThread<maxThread;
+    }
+
+
+
+
+    public static void increateConn(){
+        synchronized (LOCK){
+            currentThread++;
+        }
+    }
+
+    public static void reduceConn(){
+        synchronized (LOCK){
+            currentThread--;
+        }
+    }
 
 
     public static boolean keyIsNotEmpty(){
@@ -27,7 +58,8 @@ public class TransactionConnUtils {
      * 初始化唯一表示
      */
     public static void intKey(){
-        keys.set(UUID.randomUUID().toString()+System.currentTimeMillis());
+        String key = UUID.randomUUID().toString()+System.currentTimeMillis();
+        keys.set(key);
     }
 
     /**
@@ -62,47 +94,27 @@ public class TransactionConnUtils {
         cache.put(getKey(),connetion);
     }
 
-    /**
-     * 提交
-     */
-    public  static void commit(){
-      IntellifConnetion intellifConnetion =   cache.get(getKey());
-      try {
-        if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
-              intellifConnetion.realCommit();
-         }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 提交
      */
     public  static void commit(String key){
-        IntellifConnetion intellifConnetion =   cache.get(key);
+        IntellifConnetion intellifConnetion =  cache.get(key);
         try {
             if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
+                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>开始正式提交事务");
                 intellifConnetion.realCommit();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
     }
 
-    /**
-     * 回滚
-     */
-    public static void rollback(){
-        IntellifConnetion intellifConnetion = cache.get(getKey());
-        try {
-            if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
-                intellifConnetion.realRollback();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+
+
+
+
 
     /**
      * 回滚
@@ -111,6 +123,7 @@ public class TransactionConnUtils {
         IntellifConnetion intellifConnetion = cache.get(key);
         try {
             if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
+                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>开始正式回滚事务");
                 intellifConnetion.realRollback();
             }
         } catch (SQLException e) {
@@ -122,16 +135,15 @@ public class TransactionConnUtils {
      * 释放资源
      */
     public static void release(){
-      String key =  keys.get();
-      keys.remove();
-        removeCache(key);
+       keys.remove();
     }
 
-    private static void removeCache(String key) {
+    public static void removeConnCache(String key) {
         synchronized (TransactionConnUtils.class){
            IntellifConnetion connetion =  cache.get(key);
             try {
                 if(connetion!=null&&!connetion.isClosed()) {
+                    logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>正在关闭连接库");
                     connetion.realClose();
                 }
             } catch (SQLException e) {
@@ -145,6 +157,7 @@ public class TransactionConnUtils {
      * 释放资源
      */
     public static void release(String key){
-        removeCache(key);
+        removeConnCache(key);
+        reduceConn();
     }
 }

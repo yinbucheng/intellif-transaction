@@ -22,10 +22,14 @@ public class DataSourceAspect {
          * 需要开启分布式事务
          */
         if(TransactionConnUtils.getKey()!=null&&!TransactionConnUtils.getKey().equals("")) {
+            if(!TransactionConnUtils.canAcessConn()){
+                throw new RuntimeException("数据连接数据已经超过了指定大小");
+            }
             Connection connection = (Connection) point.proceed();
             connection.setAutoCommit(false);
             IntellifConnetion intellifConnetion = new IntellifConnetion(connection);
             TransactionConnUtils.initConn(intellifConnetion);
+            TransactionConnUtils.increateConn();
             return intellifConnetion;
         }else{
             return (Connection) point.proceed();
