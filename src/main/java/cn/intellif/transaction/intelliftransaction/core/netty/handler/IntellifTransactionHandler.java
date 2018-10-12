@@ -35,7 +35,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         String content = (String) msg;
         final NettyEntity entity = JSON.parseObject(content,NettyEntity.class);
-        if(entity.getKey()!=null&&!entity.getKey().equals("")){
+        if(entity.getStatus()!=NettyEntity.PONG){
             logger.info("获取到服务器返回的信息:" + msg);
         }
         threadPool.execute(new Runnable() {

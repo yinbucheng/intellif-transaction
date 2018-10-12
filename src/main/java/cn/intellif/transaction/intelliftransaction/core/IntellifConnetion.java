@@ -20,6 +20,7 @@ public class IntellifConnetion implements Connection {
      * 真实提交
      */
     public void realCommit() throws SQLException {
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>真正提交事务");
         connection.commit();
     }
 
@@ -28,6 +29,7 @@ public class IntellifConnetion implements Connection {
      * @throws SQLException
      */
     public void realRollback() throws SQLException {
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>真正回滚事务");
         connection.rollback();
     }
 
@@ -35,6 +37,7 @@ public class IntellifConnetion implements Connection {
      * 真实关闭
      */
     public void realClose() throws SQLException {
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>真正关闭连接");
         connection.close();
     }
 
