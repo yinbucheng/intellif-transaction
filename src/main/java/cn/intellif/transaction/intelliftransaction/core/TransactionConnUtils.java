@@ -110,6 +110,7 @@ public class TransactionConnUtils {
             try {
                 if (intellifConnetion != null && !intellifConnetion.isClosed()) {
                     intellifConnetion.realCommit();
+                    intellifConnetion.realClose();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -128,6 +129,7 @@ public class TransactionConnUtils {
             try {
                 if (intellifConnetion != null && !intellifConnetion.isClosed()) {
                     intellifConnetion.realRollback();
+                    intellifConnetion.realClose();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
