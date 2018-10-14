@@ -18,7 +18,6 @@ public class ServerListener implements ApplicationListener<ContextRefreshedEvent
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        logger.info(">>>>>>>>>>>>>>>>>>>");
          nettyClient.start();
     }
 

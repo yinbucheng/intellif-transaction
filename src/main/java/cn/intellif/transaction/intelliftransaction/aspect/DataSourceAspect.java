@@ -23,7 +23,7 @@ public class DataSourceAspect {
          */
         if(TransactionConnUtils.getKey()!=null&&!TransactionConnUtils.getKey().equals("")) {
             if(!TransactionConnUtils.canAcessConn()){
-                throw new RuntimeException("数据连接数据已经超过了指定大小");
+                throw new RuntimeException("------------------>transaction data source number is run out of ");
             }
             Connection connection = (Connection) point.proceed();
             connection.setAutoCommit(false);

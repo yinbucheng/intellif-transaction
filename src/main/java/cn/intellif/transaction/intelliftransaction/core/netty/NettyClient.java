@@ -68,7 +68,7 @@ public class NettyClient implements DisposableBean{
             });
 
             ChannelFuture future = b.connect(host, port);
-            logger.info(">>>>>>>>>>>>>>>>>>>>>>>客户端已经启动 host:" + host + ",port:" + port);
+            logger.info("------------------->transaction client starting  host:" + host + ",port:" + port);
             future.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture channelFuture) throws Exception {

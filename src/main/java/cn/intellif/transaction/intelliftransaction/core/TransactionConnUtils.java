@@ -108,7 +108,6 @@ public class TransactionConnUtils {
         IntellifConnetion intellifConnetion =  cache.get(key);
         try {
             if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
-                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>开始正式提交事务");
                 intellifConnetion.realCommit();
             }
         } catch (SQLException e) {
@@ -125,7 +124,6 @@ public class TransactionConnUtils {
         IntellifConnetion intellifConnetion = cache.get(key);
         try {
             if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
-                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>开始正式回滚事务");
                 intellifConnetion.realRollback();
             }
         } catch (SQLException e) {
@@ -145,7 +143,6 @@ public class TransactionConnUtils {
            IntellifConnetion connetion =  cache.get(key);
             try {
                 if(connetion!=null&&!connetion.isClosed()) {
-                    logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>正在关闭连接库");
                     connetion.realClose();
                 }
             } catch (SQLException e) {

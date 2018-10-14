@@ -36,7 +36,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
         String content = (String) msg;
         final NettyEntity entity = JSON.parseObject(content,NettyEntity.class);
         if(entity.getStatus()!=NettyEntity.PONG){
-            logger.info("获取到服务器返回的信息:" + msg);
+            logger.info("----------->acquire txmanager response msg:" + msg);
         }
         threadPool.execute(new Runnable() {
             @Override
@@ -53,9 +53,6 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
     private void handleMsg(final  NettyEntity nettyEntity){
         String key = nettyEntity.getKey();
         int state = nettyEntity.getStatus();
-        if(state!=NettyEntity.PONG){
-            logger.info(">>>>>>>>>>>>>>>>>>>>>>接收服务端数据:"+nettyEntity.toString());
-        }
         if(!key.equals("")) {
             if (state == NettyEntity.COMMIT) {
                 TransactionConnUtils.commit(key);
@@ -70,7 +67,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>客户端出现问题:"+ctx);
+        logger.error("-------------------->transaction client have broke :"+cause.getMessage()+cause.getCause());
         cause.printStackTrace();
         ctx.close();
     }
@@ -78,7 +75,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        logger.info(">>>>>>>>>>>>>>和客户端连接已经断开  -->" + ctx);
+        logger.info("---------------->transaction client disconnect with txmanger");
         SocketManager.getInstance().setNetState(false);
         //链接断开,重新连接
         ApplicationContextAwareUtils.getBean(NettyClient.class).restart();

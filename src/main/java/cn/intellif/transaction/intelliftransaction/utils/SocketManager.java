@@ -26,13 +26,12 @@ public class SocketManager {
     public void sendMsg(String msg){
         if(!netState)
             return;
-        logger.info(">>>>>>>>>>>>>>>>>>>>发送消息:"+msg);
+        if(!msg.contains("key:\"\"")) {
+            logger.info("------------------->send msg to txmanger:" + msg);
+        }
         context.writeAndFlush(msg);
     }
 
-    public boolean isNetState() {
-        return netState;
-    }
 
     public void setNetState(boolean netState) {
         this.netState = netState;

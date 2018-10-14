@@ -20,7 +20,7 @@ public class IntellifConnetion implements Connection {
      * 真实提交
      */
     public void realCommit() throws SQLException {
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>真正提交事务");
+        logger.info("------------------->official commit transaction ");
         connection.commit();
     }
 
@@ -29,7 +29,7 @@ public class IntellifConnetion implements Connection {
      * @throws SQLException
      */
     public void realRollback() throws SQLException {
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>真正回滚事务");
+        logger.info("------------------>official rollback transaction");
         connection.rollback();
     }
 
@@ -37,7 +37,7 @@ public class IntellifConnetion implements Connection {
      * 真实关闭
      */
     public void realClose() throws SQLException {
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>真正关闭连接");
+        logger.info("----------------->official close db connection");
         connection.close();
     }
 
@@ -73,17 +73,17 @@ public class IntellifConnetion implements Connection {
 
     @Override
     public void commit() throws SQLException {
-       logger.info(">>>>>>>>>>>>>>>commit...do nothing");
+       logger.info("-------------------->commit transaction but do nothing");
     }
 
     @Override
     public void rollback() throws SQLException {
-      logger.info(">>>>>>>>>>>>>>rollback...do nothing");
+      logger.info("-------------------->rollback transaction but do nothing");
     }
 
     @Override
     public void close() throws SQLException {
-      logger.info(">>>>>>>>>>>>>>>close......do nothing");
+      logger.info("------------------->close db connetion but do nothing");
     }
 
 
