@@ -14,7 +14,7 @@ public class TransactionConnUtils {
     private static LinkedHashMap<String,IntellifConnetion> cache = new LinkedHashMap<String,IntellifConnetion>(){
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size()>100;
+            return size()>200;
         }
     };
     private static Logger logger = LoggerFactory.getLogger(TransactionConnUtils.class);
@@ -105,13 +105,15 @@ public class TransactionConnUtils {
      * 提交
      */
     public  static void commit(String key){
-        IntellifConnetion intellifConnetion =  cache.get(key);
-        try {
-            if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
-                intellifConnetion.realCommit();
+        synchronized (key) {
+            IntellifConnetion intellifConnetion = cache.get(key);
+            try {
+                if (intellifConnetion != null && !intellifConnetion.isClosed()) {
+                    intellifConnetion.realCommit();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
 
     }
@@ -121,13 +123,15 @@ public class TransactionConnUtils {
      * 回滚
      */
     public static void rollback(String key){
-        IntellifConnetion intellifConnetion = cache.get(key);
-        try {
-            if(intellifConnetion!=null&&!intellifConnetion.isClosed()) {
-                intellifConnetion.realRollback();
+        synchronized (key) {
+            IntellifConnetion intellifConnetion = cache.get(key);
+            try {
+                if (intellifConnetion != null && !intellifConnetion.isClosed()) {
+                    intellifConnetion.realRollback();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
