@@ -1,13 +1,12 @@
 package cn.intellif.transaction.intelliftransaction.core.netty;
 
+import cn.intellif.transaction.intelliftransaction.core.ITxManagerList;
 import cn.intellif.transaction.intelliftransaction.core.netty.handler.IntellifTransactionHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
@@ -15,9 +14,10 @@ import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -26,12 +26,8 @@ public class NettyClient implements DisposableBean{
     private static Logger logger = LoggerFactory.getLogger(NettyClient.class);
     private EventLoopGroup workerGroup;
     private volatile  boolean isStarting = false;
-    @Value("${intellif.txmanger.port}")
-    private Integer port;
-    @Value("${intellif.txmanager.host}")
-    private String host;
-    @Value("${intellif.txmanager.heart}")
-    private Integer heart;
+    @Autowired
+    private ITxManagerList txManagerList;
 
     /**
      * 重启
@@ -45,11 +41,13 @@ public class NettyClient implements DisposableBean{
      * 启动
      */
     public void start(){
+        Map<String,Object> tempData = txManagerList.acquireActiveTxManger();
+        String host = (String) tempData.get("url");
+        int port = (int) tempData.get("port");
         if (isStarting) {
             return;
         }
         isStarting = true;
-
         workerGroup = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
