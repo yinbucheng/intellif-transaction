@@ -29,7 +29,7 @@ public class DataSourceAspect {
             if(!TransactionConnUtils.canAcessConn()){
                 throw new RuntimeException("----------->transaction data source number is run out of ");
             }
-            logger.info("-----------> proxy db connection");
+            logger.info("-----------> proxy db connection  with key:"+TransactionConnUtils.getKey());
             Connection connection = (Connection) point.proceed();
             connection.setAutoCommit(false);
             IntellifConnetion intellifConnetion = new IntellifConnetion(connection);

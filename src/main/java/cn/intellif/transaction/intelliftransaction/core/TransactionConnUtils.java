@@ -105,13 +105,15 @@ public class TransactionConnUtils {
      * 提交
      */
     public  static void commit(String key){
-        synchronized (key) {
+        synchronized (TransactionConnUtils.class) {
             IntellifConnetion intellifConnetion = cache.get(key);
             try {
                 if (intellifConnetion != null && !intellifConnetion.isClosed()) {
                     intellifConnetion.realCommit();
                     intellifConnetion.realClose();
+                    logger.info("-----------> execute real commit and close with key:"+key);
                 }
+                cache.remove(key);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -124,13 +126,15 @@ public class TransactionConnUtils {
      * 回滚
      */
     public static void rollback(String key){
-        synchronized (key) {
+        synchronized (TransactionConnUtils.class) {
             IntellifConnetion intellifConnetion = cache.get(key);
             try {
                 if (intellifConnetion != null && !intellifConnetion.isClosed()) {
                     intellifConnetion.realRollback();
                     intellifConnetion.realClose();
+                    logger.info("-----------> execute real rollback and close with key:"+key);
                 }
+                cache.remove(key);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -162,7 +166,7 @@ public class TransactionConnUtils {
      * 释放资源
      */
     public static void release(String key){
-        removeConnCache(key);
+        //removeConnCache(key);
         reduceConn();
     }
 }
