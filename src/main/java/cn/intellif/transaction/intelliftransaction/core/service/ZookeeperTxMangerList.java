@@ -22,19 +22,35 @@ public class ZookeeperTxMangerList implements ITxManagerList {
     @Override
     public Map<String,Object> acquireActiveTxManger() {
         CuratorFramework client =  CuratorUtils.getClient(url, Constant.INTELLIF_TRANSACTION_NAMSPACE);
-        List<String> childs = CuratorUtils.listChildPaths(client,"/");
-        if(childs==null||childs.size()==0){
-            throw new RuntimeException("----------->there no active txmanger can use");
+        try {
+            List<String> childs = CuratorUtils.listChildPaths(client, "/");
+            logger.info("----------->get path from zookeeper:" + childs);
+            if (childs == null || childs.size() == 0) {
+                logger.error("----------->there no active txmanger can use, use default host 127.0.0.1 and port 9898");
+                Map<String, Object> map = new HashMap<>();
+                map.put("url", "127.0.0.1");
+                map.put("port", 9898);
+                return map;
+            }
+            String data = childs.get(0);
+            String[] temps = data.split("-");
+            String url = temps[0];
+            Integer port = Integer.parseInt(temps[1]);
+            Map<String, Object> result = new HashMap<>();
+            result.put("url", url);
+            result.put("port", port);
+            logger.info("----------->acquire netty connection url and port from zookeeper, url:" + url + " port:" + port);
+            return result;
+        }catch (Exception e){
+            logger.error("-----------> acquire netty connection cause error:"+e.getCause()+e.getMessage());
+            Map<String, Object> map = new HashMap<>();
+            map.put("url", "127.0.0.1");
+            map.put("port", 9898);
+            return map;
+        }finally {
+            if(client!=null) {
+                client.close();
+            }
         }
-        String data = childs.get(0);
-        String[] temps = data.split("-");
-        String url = temps[0];
-        Integer port = Integer.parseInt(temps[1]);
-        Map<String,Object> result = new HashMap<>();
-        result.put("url",url);
-        result.put("port",port);
-        client.close();
-        logger.info("----------->acquire netty connetion url and port from zookeeper, url:"+url+" port:"+port);
-        return result;
     }
 }

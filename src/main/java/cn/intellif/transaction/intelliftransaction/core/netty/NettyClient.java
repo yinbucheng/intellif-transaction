@@ -82,7 +82,7 @@ public class NettyClient implements DisposableBean{
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
+            logger.error("-----------> netty start error:"+e.getMessage()+e.getCause());
             isStarting =false;
             if(workerGroup!=null){
                 workerGroup.shutdownGracefully();
