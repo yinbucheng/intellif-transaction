@@ -5,6 +5,8 @@ import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -16,6 +18,8 @@ import java.sql.Connection;
 @Component
 public class DataSourceAspect {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Around("execution(* javax.sql.DataSource.getConnection(..))")
     public Connection aroudGetConnetion(ProceedingJoinPoint point) throws Throwable {
         /**
@@ -25,6 +29,7 @@ public class DataSourceAspect {
             if(!TransactionConnUtils.canAcessConn()){
                 throw new RuntimeException("----------->transaction data source number is run out of ");
             }
+            logger.info("-----------> proxy db connection");
             Connection connection = (Connection) point.proceed();
             connection.setAutoCommit(false);
             IntellifConnetion intellifConnetion = new IntellifConnetion(connection);
