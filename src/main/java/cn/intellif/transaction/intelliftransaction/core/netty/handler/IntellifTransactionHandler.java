@@ -67,7 +67,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("-------------------->transaction client have broke :"+cause.getMessage()+cause.getCause());
+        logger.error("----------->transaction client have broke :"+cause.getMessage()+cause.getCause());
         cause.printStackTrace();
         ctx.close();
     }
@@ -75,7 +75,7 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        logger.info("---------------->transaction client disconnect with txmanger");
+        logger.info("----------->transaction client disconnect with txmanger");
         SocketManager.getInstance().setNetState(false);
         //链接断开,重新连接
         ApplicationContextAwareUtils.getBean(NettyClient.class).restart();

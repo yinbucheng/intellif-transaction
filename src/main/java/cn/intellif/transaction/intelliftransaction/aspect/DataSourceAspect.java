@@ -23,7 +23,7 @@ public class DataSourceAspect {
          */
         if(TransactionConnUtils.getKey()!=null&&!TransactionConnUtils.getKey().equals("")) {
             if(!TransactionConnUtils.canAcessConn()){
-                throw new RuntimeException("------------------>transaction data source number is run out of ");
+                throw new RuntimeException("----------->transaction data source number is run out of ");
             }
             Connection connection = (Connection) point.proceed();
             connection.setAutoCommit(false);

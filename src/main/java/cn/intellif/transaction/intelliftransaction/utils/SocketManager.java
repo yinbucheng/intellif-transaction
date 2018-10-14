@@ -26,8 +26,8 @@ public class SocketManager {
     public void sendMsg(String msg){
         if(!netState)
             return;
-        if(!msg.contains("key:\"\"")) {
-            logger.info("------------------->send msg to txmanger:" + msg);
+        if(!msg.contains("\"key\":\"\"")) {
+            logger.info("----------->send msg to txmanger:" + msg);
         }
         context.writeAndFlush(msg);
     }
