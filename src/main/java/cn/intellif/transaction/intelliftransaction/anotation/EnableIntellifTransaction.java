@@ -1,6 +1,7 @@
 package cn.intellif.transaction.intelliftransaction.anotation;
 
 import cn.intellif.transaction.intelliftransaction.aspect.DataSourceAspect;
+import cn.intellif.transaction.intelliftransaction.aspect.TransactionAspect;
 import cn.intellif.transaction.intelliftransaction.aspect.TxTransactionAspect;
 import cn.intellif.transaction.intelliftransaction.aware.ApplicationContextAwareUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.NettyClient;
@@ -15,6 +16,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Import({DataSourceAspect.class, TxTransactionAspect.class, NettyClient.class, ServerListener.class, TransactionRequestInterceptor.class, ApplicationContextAwareUtils.class})
+@Import({DataSourceAspect.class, TxTransactionAspect.class, TransactionAspect.class,NettyClient.class, ServerListener.class, TransactionRequestInterceptor.class, ApplicationContextAwareUtils.class})
 public @interface EnableIntellifTransaction {
 }
