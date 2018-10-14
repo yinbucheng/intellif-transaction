@@ -51,6 +51,7 @@ public class TxTransactionAspect  implements Ordered {
             //将唯一表示告诉txmanger并开启超时机制
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
             Object result =  joinPoint.proceed();
+            Thread.sleep(10);
            //发送提交命令 及关闭命令
             SocketManager.getInstance().sendMsg(ProtocolUtils.commit());
             return result;
