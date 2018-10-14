@@ -46,6 +46,9 @@ public class TxTransactionAspect  implements Ordered {
          */
         TransactionConnUtils.intKey();
         try{
+            if(!SocketManager.getInstance().getNetState()){
+                throw new RuntimeException("----> txmanger is close please make sure txmanager is running");
+            }
             //将唯一表示告诉txmanger并开启超时机制
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
             Object result =  joinPoint.proceed();
@@ -87,6 +90,9 @@ public class TxTransactionAspect  implements Ordered {
         }
         TransactionConnUtils.initKey(token);
         try{
+            if(!SocketManager.getInstance().getNetState()){
+                throw new RuntimeException("----> txmanger is close please make sure txmanager is running");
+            }
             logger.info(">>>>>>>>>>>>>>>>>>>>>>进入代理方法中");
             //将唯一标示告诉txManager
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());

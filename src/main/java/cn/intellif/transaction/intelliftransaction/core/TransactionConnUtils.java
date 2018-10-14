@@ -6,11 +6,17 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class TransactionConnUtils {
-    private static Map<String,IntellifConnetion> cache = new HashMap<>();
+    private static LinkedHashMap<String,IntellifConnetion> cache = new LinkedHashMap<String,IntellifConnetion>(){
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size()>100;
+        }
+    };
     private static Logger logger = LoggerFactory.getLogger(TransactionConnUtils.class);
 
     private static ThreadLocal<String> keys = new ThreadLocal<>();

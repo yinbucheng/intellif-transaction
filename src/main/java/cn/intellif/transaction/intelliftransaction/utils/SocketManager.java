@@ -37,4 +37,8 @@ public class SocketManager {
     public void setNetState(boolean netState) {
         this.netState = netState;
     }
+
+    public boolean getNetState(){
+        return netState;
+    }
 }
