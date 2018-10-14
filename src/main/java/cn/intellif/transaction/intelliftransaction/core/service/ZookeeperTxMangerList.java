@@ -4,6 +4,8 @@ import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.ITxManagerList;
 import cn.intellif.transaction.intelliftransaction.zookeeper.CuratorUtils;
 import org.apache.curator.framework.CuratorFramework;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +17,7 @@ import java.util.Map;
 public class ZookeeperTxMangerList implements ITxManagerList {
     @Value("${intelli.txmanger.zookeeper.url}")
     private String url;
-
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public Map<String,Object> acquireActiveTxManger() {
@@ -32,6 +34,7 @@ public class ZookeeperTxMangerList implements ITxManagerList {
         result.put("url",url);
         result.put("port",port);
         client.close();
+        logger.info("----------->acquire netty connetion url and port from zookeeper, url:"+url+" port:"+port);
         return result;
     }
 }
