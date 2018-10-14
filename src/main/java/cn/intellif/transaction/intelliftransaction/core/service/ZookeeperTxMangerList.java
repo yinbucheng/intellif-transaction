@@ -9,9 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ZookeeperTxMangerList implements ITxManagerList {
@@ -32,6 +30,7 @@ public class ZookeeperTxMangerList implements ITxManagerList {
                 map.put("port", 9898);
                 return map;
             }
+            Collections.sort(childs);
             String data = childs.get(0);
             String[] temps = data.split("-");
             String url = temps[0];
