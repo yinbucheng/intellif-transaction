@@ -50,8 +50,10 @@ public class TransactionAspect implements Ordered {
                 throw new RuntimeException("-----------> txmanger is closed please make sure txmanager is running");
             }
             logger.info("----------->in transaction proxy method");
+            LockUtils.initLock(token);
             //将唯一标示告诉txManager
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
+            LockUtils.getLock(token).await(60);
             return joinPoint.proceed();
         }catch (Exception e){
             //发送异常信息告诉txManager

@@ -24,7 +24,10 @@ public class LockUtils {
 
     public synchronized static void initLock(String key){
         LockUtils lockUtils = new LockUtils();
-        locks.put(key,lockUtils);
+       LockUtils oldLock =  locks.put(key,lockUtils);
+       if(oldLock!=null){
+           oldLock.signal();
+       }
     }
 
     public  void await(){
