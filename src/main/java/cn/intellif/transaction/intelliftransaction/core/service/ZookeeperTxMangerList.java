@@ -30,8 +30,8 @@ public class ZookeeperTxMangerList implements ITxManagerList {
                 map.put("port", 9898);
                 return map;
             }
-            Collections.sort(childs);
-            String data = childs.get(0);
+
+           String data = getFirst(childs);
             String[] temps = data.split("-");
             String url = temps[1];
             Integer port = Integer.parseInt(temps[2]);
@@ -51,5 +51,20 @@ public class ZookeeperTxMangerList implements ITxManagerList {
                 client.close();
             }
         }
+    }
+
+    private String getFirst(List<String> childs){
+        List<String> firstChilds = new LinkedList<String>();
+        for(String child:childs){
+            firstChilds.add(child.split("-")[0]);
+        }
+        Collections.sort(firstChilds);
+        String firstHead = firstChilds.get(0);
+        for(String child:childs){
+            if(child.startsWith(firstHead+"-")){
+                return child;
+            }
+        }
+        return null;
     }
 }
