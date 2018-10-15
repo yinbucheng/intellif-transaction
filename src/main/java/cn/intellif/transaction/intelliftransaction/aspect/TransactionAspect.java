@@ -51,7 +51,9 @@ public class TransactionAspect implements Ordered {
             }
             logger.info("----------->in transaction proxy method");
             //将唯一标示告诉txManager
+            LockUtils.initLock(token);
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
+            LockUtils.getLock(token).await(60);
             return joinPoint.proceed();
         }catch (Exception e){
             //发送异常信息告诉txManager
