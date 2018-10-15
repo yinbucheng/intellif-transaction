@@ -33,8 +33,8 @@ public class ZookeeperTxMangerList implements ITxManagerList {
             Collections.sort(childs);
             String data = childs.get(0);
             String[] temps = data.split("-");
-            String url = temps[0];
-            Integer port = Integer.parseInt(temps[1]);
+            String url = temps[1];
+            Integer port = Integer.parseInt(temps[2]);
             Map<String, Object> result = new HashMap<>();
             result.put("url", url);
             result.put("port", port);

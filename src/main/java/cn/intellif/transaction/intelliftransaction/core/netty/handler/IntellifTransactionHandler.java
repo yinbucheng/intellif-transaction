@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
 
 @ChannelHandler.Sharable
 public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
@@ -70,7 +71,10 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
             }
             if(state==NettyEntity.REGISTER_SUCCESS){
                 //唤醒锁
-                LockUtils.getLock(key).signal();
+              LockUtils lock =  LockUtils.getLock(key);
+              if(lock!=null) {
+                  lock.signal();
+              }
             }
 
         }
