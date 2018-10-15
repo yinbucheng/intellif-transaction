@@ -41,7 +41,8 @@ public class TransactionAspect implements Ordered {
         }
         String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
         logger.info("----------->acquire current transaction token:"+token);
-        if(token==null){
+        //这里表示不存放分布式事务或者已经被代理过了
+        if(token==null||TransactionConnUtils.keyIsNotEmpty()){
             return joinPoint.proceed();
         }
         TransactionConnUtils.initKey(token);
