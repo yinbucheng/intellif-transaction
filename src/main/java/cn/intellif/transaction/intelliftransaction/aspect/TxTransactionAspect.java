@@ -19,8 +19,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxTransactionAspect  implements Ordered {
 
-    @Value("${intellif.transacton.timeout}")
-    private Integer timeout;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
