@@ -3,6 +3,7 @@ package cn.intellif.transaction.intelliftransaction.aspect;
 import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
+import cn.intellif.transaction.intelliftransaction.utils.LockUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import cn.intellif.transaction.intelliftransaction.utils.WebUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.locks.Lock;
 
 @Aspect
 @Component
@@ -43,15 +46,17 @@ public class TxTransactionAspect  implements Ordered {
          * 创建唯一标示
          */
         TransactionConnUtils.intKey();
+        String key = TransactionConnUtils.getKey();
         try{
             if(!SocketManager.getInstance().getNetState()){
                 throw new RuntimeException("-----------> txmanger is closed please make sure txmanager is running");
             }
             logger.info("-----------> begian create a new  distributed transaction");
             //将唯一表示告诉txmanger并开启超时机制
+            LockUtils.initLock(key);
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
+            LockUtils.getLock(key).await(60);
             Object result =  joinPoint.proceed();
-            Thread.sleep(10);
            //发送提交命令 及关闭命令
             SocketManager.getInstance().sendMsg(ProtocolUtils.commit());
             return result;
@@ -61,9 +66,10 @@ public class TxTransactionAspect  implements Ordered {
             throw new RuntimeException(e);
         }finally {
             //释放资源
-            Thread.sleep(10);
+            Thread.sleep(20);
             SocketManager.getInstance().sendMsg(ProtocolUtils.clear());
             TransactionConnUtils.release();
+            LockUtils.removeLock(key);
         }
     }
 

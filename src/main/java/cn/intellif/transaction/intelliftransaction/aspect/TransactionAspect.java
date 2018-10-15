@@ -4,6 +4,7 @@ import cn.intellif.transaction.intelliftransaction.anotation.TxTransaction;
 import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
+import cn.intellif.transaction.intelliftransaction.utils.LockUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import cn.intellif.transaction.intelliftransaction.utils.WebUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.locks.Lock;
 
 @Aspect
 @Component
@@ -52,10 +55,13 @@ public class TransactionAspect implements Ordered {
             return joinPoint.proceed();
         }catch (Exception e){
             //发送异常信息告诉txManager
+            LockUtils.initLock(token);
             SocketManager.getInstance().sendMsg(ProtocolUtils.rollback());
+            LockUtils.getLock(token).await(60);
             throw new RuntimeException(e);
         }finally {
             TransactionConnUtils.release();
+            LockUtils.removeLock(token);
         }
 
     }

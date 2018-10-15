@@ -5,6 +5,7 @@ import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.NettyClient;
 import cn.intellif.transaction.intelliftransaction.core.netty.entity.NettyEntity;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
+import cn.intellif.transaction.intelliftransaction.utils.LockUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.ChannelHandler;
@@ -61,7 +62,17 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
             if (state == NettyEntity.ROLLBACK) {
                 TransactionConnUtils.rollback(key);
                 TransactionConnUtils.release(key);
+                //如果有锁就先释放锁
+                LockUtils lock =  LockUtils.getLock(key);
+                if(lock!=null){
+                    lock.signal();
+                }
             }
+            if(state==NettyEntity.REGISTER_SUCCESS){
+                //唤醒锁
+                LockUtils.getLock(key).signal();
+            }
+
         }
     }
 

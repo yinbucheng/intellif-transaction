@@ -16,6 +16,8 @@ public class NettyEntity implements Serializable{
     public static int ROLLBACK =3;
     public static int CLOSE =4;
     public static int REGISTER =5;
+    public static int REGISTER_SUCCESS =6;
+    public static int ROLLBACK_SUCCESS =7;
 
     public NettyEntity() {
     }
