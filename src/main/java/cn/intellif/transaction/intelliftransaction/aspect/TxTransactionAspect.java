@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.locks.Lock;
-
 @Aspect
 @Component
 public class TxTransactionAspect  implements Ordered {

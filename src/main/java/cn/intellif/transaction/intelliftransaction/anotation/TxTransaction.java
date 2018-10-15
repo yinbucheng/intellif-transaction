@@ -8,6 +8,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface TxTransaction {
-    //默认超时时间为6秒
-    long waitTime()default 6;
 }
