@@ -61,6 +61,7 @@ public class TransactionAspect implements Ordered {
             LockUtils.initLock(token);
             SocketManager.getInstance().sendMsg(ProtocolUtils.rollback());
             LockUtils.getLock(token).await(60);
+            TransactionConnUtils.rollback(token);
             throw new RuntimeException(e);
         }finally {
             TransactionConnUtils.release();

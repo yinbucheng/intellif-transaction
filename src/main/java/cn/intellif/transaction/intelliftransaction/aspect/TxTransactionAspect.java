@@ -58,6 +58,7 @@ public class TxTransactionAspect  implements Ordered {
         }catch (Exception e){
             //发送回滚及 关闭命令
             SocketManager.getInstance().sendMsg(ProtocolUtils.rollback());
+            TransactionConnUtils.rollback(key);
             throw new RuntimeException(e);
         }finally {
             //释放资源
