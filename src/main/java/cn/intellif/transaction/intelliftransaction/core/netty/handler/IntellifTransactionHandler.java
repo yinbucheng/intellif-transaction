@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.Lock;
 
 @ChannelHandler.Sharable
 public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{

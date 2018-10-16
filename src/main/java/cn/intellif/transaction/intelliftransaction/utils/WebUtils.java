@@ -12,9 +12,6 @@ public class WebUtils {
         return (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     }
 
-    private static String getRequestToken(){
-        return getRequest().toString();
-    }
 
     public static HttpServletRequest getRequest(){
         return getAttributes().getRequest();

@@ -63,7 +63,7 @@ public class TransactionConnUtils {
     /**
      * 初始化唯一表示
      */
-    public static void intKey(){
+    public static void initKey(){
         String key = UUID.randomUUID().toString()+System.currentTimeMillis();
         keys.set(key);
     }
