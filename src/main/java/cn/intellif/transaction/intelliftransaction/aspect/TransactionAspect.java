@@ -4,6 +4,7 @@ import cn.intellif.transaction.intelliftransaction.anotation.TxTransaction;
 import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
+import cn.intellif.transaction.intelliftransaction.utils.ConnectionTimeOutUtils;
 import cn.intellif.transaction.intelliftransaction.utils.LockUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import cn.intellif.transaction.intelliftransaction.utils.WebUtils;
@@ -13,6 +14,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,9 @@ import java.util.concurrent.locks.Lock;
 public class TransactionAspect implements Ordered {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Value("${intellif.transaction.timeout}")
+    private Integer timeout;
 
     @Around("@annotation(org.springframework.transaction.annotation.Transactional)")
     public Object aroundWithTr(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -55,6 +60,7 @@ public class TransactionAspect implements Ordered {
             LockUtils.initLock(token);
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
             LockUtils.getLock(token).await(60);
+            ConnectionTimeOutUtils.timeOut(timeout,token);
             return joinPoint.proceed();
         }catch (Exception e){
             //发送异常信息告诉txManager

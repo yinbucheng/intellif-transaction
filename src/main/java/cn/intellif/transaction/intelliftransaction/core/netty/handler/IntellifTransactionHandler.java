@@ -58,6 +58,10 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
             if (state == NettyEntity.COMMIT) {
                 TransactionConnUtils.commit(key);
                 TransactionConnUtils.release(key);
+                LockUtils lock = LockUtils.getLock(key+"timeout");
+                if(lock!=null){
+                    lock.signal();
+                }
             }
             if (state == NettyEntity.ROLLBACK) {
                 TransactionConnUtils.rollback(key);
@@ -66,6 +70,10 @@ public class IntellifTransactionHandler extends ChannelInboundHandlerAdapter{
                 LockUtils lock =  LockUtils.getLock(key);
                 if(lock!=null){
                     lock.signal();
+                }
+                LockUtils lock2 = LockUtils.getLock(key+"timeout");
+                if(lock2!=null){
+                    lock2.signal();
                 }
             }
             if(state==NettyEntity.REGISTER_SUCCESS){
