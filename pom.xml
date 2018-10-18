@@ -99,6 +99,23 @@
 
 	</dependencyManagement>
 
+	<repositories>
+		<repository>
+			<id>Central</id>
+			<url>http://192.168.2.34:8081/nexus/content/groups/public/</url>
+		</repository>
+	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>if_release</id>
+			<url>http://192.168.2.34:8081/nexus/content/repositories/if_release</url>
+		</repository>
+		<snapshotRepository>
+			<id>if_snapshots</id>
+			<url>http://192.168.2.34:8081/nexus/content/repositories/if_snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<build>
 		<pluginManagement>
 			<plugins>
