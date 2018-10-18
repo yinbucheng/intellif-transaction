@@ -39,7 +39,7 @@ public class TxTransactionAspect  implements Ordered {
     private Object runTxTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
         //判断其是否为上一个调用链过来的如果是直接放行
         String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
-        if(token!=null&&!token.equals("")){
+        if(token!=null&&!token.equals("")||TransactionConnUtils.keyIsNotEmpty()){
             return joinPoint.proceed();
         }
         /**
