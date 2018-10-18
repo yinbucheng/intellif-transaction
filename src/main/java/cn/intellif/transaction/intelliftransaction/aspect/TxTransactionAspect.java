@@ -3,6 +3,7 @@ package cn.intellif.transaction.intelliftransaction.aspect;
 import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
+import cn.intellif.transaction.intelliftransaction.utils.ConnectionTimeOutUtils;
 import cn.intellif.transaction.intelliftransaction.utils.LockUtils;
 import cn.intellif.transaction.intelliftransaction.utils.SocketManager;
 import cn.intellif.transaction.intelliftransaction.utils.WebUtils;
@@ -11,6 +12,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +22,8 @@ public class TxTransactionAspect  implements Ordered {
 
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Value("${intellif.transaction.timeout}")
+    private Integer timeout;
 
     @Around("@annotation(cn.intellif.transaction.intelliftransaction.anotation.TxTransaction)")
     public Object aroundWithTx(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -51,6 +55,7 @@ public class TxTransactionAspect  implements Ordered {
             LockUtils.initLock(key);
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
             LockUtils.getLock(key).await(60);
+            ConnectionTimeOutUtils.timeOut(timeout,key);
             Object result =  joinPoint.proceed();
            //发送提交命令 及关闭命令
             SocketManager.getInstance().sendMsg(ProtocolUtils.commit());
@@ -66,6 +71,7 @@ public class TxTransactionAspect  implements Ordered {
             SocketManager.getInstance().sendMsg(ProtocolUtils.clear());
             TransactionConnUtils.release();
             LockUtils.removeLock(key);
+            LockUtils.removeLock(key+"timeout");
         }
     }
 
