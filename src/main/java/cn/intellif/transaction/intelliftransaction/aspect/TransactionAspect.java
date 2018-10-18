@@ -35,14 +35,14 @@ public class TransactionAspect implements Ordered {
     }
 
     private Object runTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
-        Class clazz =  AopUtils.getTargetClass(joinPoint.getTarget());
-        if(clazz.getAnnotation(TxTransaction.class)!=null&& TransactionConnUtils.keyIsNotEmpty()){
+       //如果被自己服务的上一个方法代理过直接放行
+        if(TransactionConnUtils.keyIsNotEmpty()){
             return joinPoint.proceed();
         }
         String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
         logger.info("----------->acquire current transaction token:"+token);
-        //这里表示不存放分布式事务或者已经被代理过了
-        if(token==null||TransactionConnUtils.keyIsNotEmpty()){
+        //未被自己上一个服务代理过但不需要进行代理
+        if(token==null){
             return joinPoint.proceed();
         }
         TransactionConnUtils.initKey(token);
