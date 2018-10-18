@@ -1,12 +1,6 @@
 package cn.intellif.transaction.intelliftransaction.utils;
 
-import cn.intellif.transaction.intelliftransaction.core.IntellifConnetion;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.locks.Lock;
 
 /**
  * 连接超时工具
