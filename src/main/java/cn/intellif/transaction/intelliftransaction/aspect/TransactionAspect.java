@@ -54,13 +54,13 @@ public class TransactionAspect implements Ordered {
             //将唯一标示告诉txManager
             LockUtils.initLock(token);
             SocketManager.getInstance().sendMsg(ProtocolUtils.register());
-            LockUtils.getLock(token).await(60);
+            LockUtils.getLock(token).await(120);
             return joinPoint.proceed();
         }catch (Exception e){
             //发送异常信息告诉txManager
             LockUtils.initLock(token);
             SocketManager.getInstance().sendMsg(ProtocolUtils.rollback());
-            LockUtils.getLock(token).await(60);
+            LockUtils.getLock(token).await(120);
             TransactionConnUtils.rollback(token);
             throw new RuntimeException(e);
         }finally {
