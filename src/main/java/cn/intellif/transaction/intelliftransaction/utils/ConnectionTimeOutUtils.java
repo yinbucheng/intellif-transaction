@@ -19,6 +19,8 @@ public class ConnectionTimeOutUtils {
                     TransactionConnUtils.remveConnection(key);
                 } catch (Exception e) {
                     e.printStackTrace();
+                }finally {
+                    LockUtils.removeLock(key+"timeout");
                 }
             }
         });

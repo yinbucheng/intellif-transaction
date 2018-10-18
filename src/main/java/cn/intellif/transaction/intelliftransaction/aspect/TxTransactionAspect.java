@@ -72,7 +72,6 @@ public class TxTransactionAspect  implements Ordered {
             SocketManager.getInstance().sendMsg(ProtocolUtils.clear());
             TransactionConnUtils.release();
             LockUtils.removeLock(key);
-            LockUtils.removeLock(key+"timeout");
         }
     }
 
