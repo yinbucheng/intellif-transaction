@@ -39,12 +39,13 @@ public class TransactionAspect implements Ordered {
     }
 
     private Object runTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+        //未被自己服务上个方法代理过
         if(TransactionConnUtils.keyIsNotEmpty()){
             return joinPoint.proceed();
         }
         String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
         logger.info("----------->acquire current transaction token:"+token);
-        //这里表示不存放分布式事务或者已经被代理过了
+        //上个服务调用过来需要进行代理
         if(token==null||token.equals("")){
             return joinPoint.proceed();
         }
