@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>cn.intellif.transaction</groupId>
-	<artifactId>intellif-transaction</artifactId>
+	<artifactId>ifaas-transaction</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>intellif-transaction</name>
+	<name>ifaas-transaction</name>
 	<description>Demo project for Spring Boot</description>
 
 	<parent>
