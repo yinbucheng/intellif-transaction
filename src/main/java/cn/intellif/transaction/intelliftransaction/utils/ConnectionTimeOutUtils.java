@@ -4,7 +4,6 @@ import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 连接超时工具
@@ -14,7 +13,7 @@ public class ConnectionTimeOutUtils {
     public static Map<String,Boolean> successFlag = new LinkedHashMap<String,Boolean>(){
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return successFlag.size()>1000;
+            return entrySet().size()>1000;
         }
     };
 
