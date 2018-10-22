@@ -57,8 +57,12 @@ public class TxTransactionAspect  implements Ordered {
             LockUtils.getLock(key).await(120);
             ConnectionTimeOutUtils.timeOut(timeout,key);
             Object result =  joinPoint.proceed();
-           //发送提交命令 及关闭命令
-            SocketManager.getInstance().sendMsg(ProtocolUtils.commit());
+            if(ConnectionTimeOutUtils.successFlag(key)) {
+                //发送提交命令 及关闭命令
+                SocketManager.getInstance().sendMsg(ProtocolUtils.commit());
+            }else{
+                throw new RuntimeException("----------->throw timeout runing ");
+            }
             return result;
         }catch (Exception e){
             //发送回滚及 关闭命令
@@ -71,6 +75,7 @@ public class TxTransactionAspect  implements Ordered {
             SocketManager.getInstance().sendMsg(ProtocolUtils.clear());
             TransactionConnUtils.release();
             LockUtils.removeLock(key);
+            ConnectionTimeOutUtils.removeSuccessFlag(key);
         }
     }
 

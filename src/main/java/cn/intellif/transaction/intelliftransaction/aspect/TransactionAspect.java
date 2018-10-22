@@ -71,6 +71,7 @@ public class TransactionAspect implements Ordered {
         }finally {
             TransactionConnUtils.release();
             LockUtils.removeLock(token);
+            ConnectionTimeOutUtils.removeSuccessFlag(token);
         }
 
     }
