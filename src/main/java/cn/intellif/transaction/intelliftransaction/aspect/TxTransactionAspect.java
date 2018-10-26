@@ -25,12 +25,12 @@ public class TxTransactionAspect  implements Ordered {
     @Value("${intellif.transaction.timeout}")
     private Integer timeout;
 
-    @Around("@annotation(cn.intellif.transaction.intelliftransaction.anotation.TxTransaction)")
+    @Around("@annotation(cn.intellif.transaction.intelliftransaction.anotation.StartDTransaction)")
     public Object aroundWithTx(ProceedingJoinPoint joinPoint) throws Throwable {
         return runTxTransaction(joinPoint);
     }
 
-    @Around("this(cn.intellif.transaction.intelliftransaction.anotation.TxTransaction) && execution( * *(..))")
+    @Around("this(cn.intellif.transaction.intelliftransaction.anotation.StartDTransaction) && execution( * *(..))")
     public Object aroundWithTx2(ProceedingJoinPoint joinPoint) throws Throwable {
         return runTxTransaction(joinPoint);
     }
