@@ -25,7 +25,7 @@ public class DataSourceAspect {
         /**
          * 需要开启分布式事务
          */
-        if(TransactionConnUtils.getKey()!=null&&!TransactionConnUtils.getKey().equals("")) {
+        if(TransactionConnUtils.keyIsNotEmpty()) {
             if(!TransactionConnUtils.canAcessConn()){
                 throw new RuntimeException("----------->transaction data source number is run out of ");
             }
@@ -41,7 +41,7 @@ public class DataSourceAspect {
             TransactionConnUtils.increateConn();
             return intellifConnetion;
         }else{
-            return (Connection) point.proceed();
+            return  point.proceed();
         }
     }
 }
