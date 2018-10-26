@@ -1,6 +1,5 @@
 package cn.intellif.transaction.intelliftransaction.aspect;
 
-import cn.intellif.transaction.intelliftransaction.anotation.TxTransaction;
 import cn.intellif.transaction.intelliftransaction.constant.Constant;
 import cn.intellif.transaction.intelliftransaction.core.TransactionConnUtils;
 import cn.intellif.transaction.intelliftransaction.core.netty.protocol.ProtocolUtils;
@@ -12,11 +11,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.locks.Lock;
 
 @Aspect
 @Component

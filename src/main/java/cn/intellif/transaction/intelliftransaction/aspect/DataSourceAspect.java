@@ -20,8 +20,8 @@ public class DataSourceAspect {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Around("execution(* javax.sql.DataSource.getConnection(..))")
-    public Connection aroudGetConnetion(ProceedingJoinPoint point) throws Throwable {
+    @Around("execution(* *.*..getConnection(..))")
+    public Object aroudGetConnetion(ProceedingJoinPoint point) throws Throwable {
         /**
          * 需要开启分布式事务
          */
@@ -30,7 +30,11 @@ public class DataSourceAspect {
                 throw new RuntimeException("----------->transaction data source number is run out of ");
             }
             logger.info("-----------> proxy db connection  with key:"+TransactionConnUtils.getKey());
-            Connection connection = (Connection) point.proceed();
+            Object result = point.proceed();
+            if(!(result instanceof Connection)){
+                return result;
+            }
+            Connection connection = (Connection) result;
             connection.setAutoCommit(false);
             IntellifConnetion intellifConnetion = new IntellifConnetion(connection);
             TransactionConnUtils.initConn(intellifConnetion);
