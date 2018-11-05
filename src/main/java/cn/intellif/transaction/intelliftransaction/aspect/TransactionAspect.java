@@ -42,11 +42,11 @@ public class TransactionAspect implements Ordered {
         if(request!=null){
             token = request.getHeader(Constant.TRANSATION_TOKEN);
         }
-        logger.info("----------->acquire current transaction token:"+token);
         //未被自己上一个服务代理过但不需要进行代理
         if(token==null){
             return joinPoint.proceed();
         }
+        logger.info("----------->acquire current transaction token:"+token);
         TransactionConnUtils.initKey(token);
         try{
             if(!SocketManager.getInstance().getNetState()){
