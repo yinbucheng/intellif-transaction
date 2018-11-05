@@ -17,7 +17,10 @@ public class WebUtils {
     }
 
     public static HttpServletRequest getRequest(){
-        return getAttributes().getRequest();
+        ServletRequestAttributes attributes = getAttributes();
+        if(attributes==null)
+            return null;
+        return attributes.getRequest();
     }
 
     public static HttpServletResponse getResponse(){

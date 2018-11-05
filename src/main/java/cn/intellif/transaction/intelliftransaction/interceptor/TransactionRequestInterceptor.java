@@ -14,7 +14,7 @@ public class TransactionRequestInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate template) {
         String key = TransactionConnUtils.getKey();
-        if(key!=null){
+        if(key!=null&&!key.equals("")){
             template.header(Constant.TRANSATION_TOKEN,key);
         }
         Enumeration<String> headerNames = WebUtils.getRequest().getHeaderNames();
