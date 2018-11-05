@@ -7,7 +7,7 @@ import cn.intellif.transaction.intelliftransaction.aware.ApplicationContextAware
 import cn.intellif.transaction.intelliftransaction.core.netty.NettyClient;
 import cn.intellif.transaction.intelliftransaction.core.service.ZookeeperTxMangerList;
 import cn.intellif.transaction.intelliftransaction.interceptor.TransactionRequestInterceptor;
-import cn.intellif.transaction.intelliftransaction.listener.ServerListener;
+import cn.intellif.transaction.intelliftransaction.listener.IntellifTransactionStart;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
@@ -17,6 +17,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Import({DataSourceAspect.class, TxTransactionAspect.class, TransactionAspect.class, ZookeeperTxMangerList.class,NettyClient.class, ServerListener.class, TransactionRequestInterceptor.class, ApplicationContextAwareUtils.class})
+@Import({DataSourceAspect.class, TxTransactionAspect.class, TransactionAspect.class, ZookeeperTxMangerList.class,NettyClient.class, IntellifTransactionStart.class, TransactionRequestInterceptor.class, ApplicationContextAwareUtils.class})
 public @interface EnableIntellifTransaction {
 }
