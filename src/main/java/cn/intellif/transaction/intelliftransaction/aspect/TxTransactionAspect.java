@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Aspect
 @Component
 public class TxTransactionAspect  implements Ordered {
@@ -34,8 +36,12 @@ public class TxTransactionAspect  implements Ordered {
 
     private Object runTxTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
         //判断其是否为上一个调用链过来的如果是直接放行
-        String token =   WebUtils.getRequest().getHeader(Constant.TRANSATION_TOKEN);
-        if(token!=null&&!token.equals("")){
+        HttpServletRequest request =  WebUtils.getRequest();
+        String token = null;
+        if(request!=null){
+            token = request.getHeader(Constant.TRANSATION_TOKEN);
+        }
+        if(token!=null){
             return joinPoint.proceed();
         }
         /**
