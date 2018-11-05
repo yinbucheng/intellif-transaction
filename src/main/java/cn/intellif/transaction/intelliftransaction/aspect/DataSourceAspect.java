@@ -20,7 +20,7 @@ public class DataSourceAspect {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Around("execution(* *.*..getConnection(..))")
+    @Around("execution(* *..getConnection(..))")
     public Object aroudGetConnetion(ProceedingJoinPoint point) throws Throwable {
         /**
          * 需要开启分布式事务
